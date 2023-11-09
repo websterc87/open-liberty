@@ -16,6 +16,8 @@ bVersion=1.1
 WLP-ServerName: IBM WebSphere Liberty
 WLP-ServerVersion: ${libertyRelease}
 
+IBM-Test-Fixes: PH57878
+
 Service-Component: \
     com.ibm.ws.webcontainer.vhostmgr; \
         implementation:=com.ibm.ws.webcontainer.osgi.DynamicVirtualHostManager;\
