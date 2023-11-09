@@ -22,7 +22,7 @@ inbound HTTP connection interface, as well as the HTTP channel \
 for direct and exclusive access of traffic for specific appplication channels. \
 An outbound HTTP channel is also implemented for client traffic, version ${bVersion}.
 
-IBM-Test-Fixes: PH57878
+IBM-Interim-Fixes: PH57878
 
 Bundle-Activator: com.ibm.ws.http.internal.HttpChannelProvider
 
