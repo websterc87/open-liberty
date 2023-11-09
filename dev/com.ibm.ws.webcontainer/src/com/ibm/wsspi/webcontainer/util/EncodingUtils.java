@@ -15,7 +15,7 @@ package com.ibm.wsspi.webcontainer.util;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -87,16 +87,16 @@ public class EncodingUtils {
     public static final boolean setContentTypeBySetHeader;
 
     static {
-    	String propStr = WebContainer.getWebContainerProperties().getProperty("com.ibm.ws.webcontainer.setcontenttypebysetheader");
-    	if (propStr==null||propStr.equalsIgnoreCase("true")){
-    		setContentTypeBySetHeader = true;
-    	}
-    	else {
-    		setContentTypeBySetHeader = false;
-    	}
-    	if (com.ibm.ejs.ras.TraceComponent.isAnyTracingEnabled()&&logger.isLoggable (Level.FINE)){
-    		logger.logp(Level.FINE, CLASS_NAME,"staticInitializer","setContentTypeBySetHeader="+Boolean.toString(setContentTypeBySetHeader));
-    	}
+        String propStr = WebContainer.getWebContainerProperties().getProperty("com.ibm.ws.webcontainer.setcontenttypebysetheader");
+        if (propStr==null||propStr.equalsIgnoreCase("true")){
+                setContentTypeBySetHeader = true;
+        }
+        else {
+                setContentTypeBySetHeader = false;
+        }
+        if (com.ibm.ejs.ras.TraceComponent.isAnyTracingEnabled()&&logger.isLoggable (Level.FINE)){
+                logger.logp(Level.FINE, CLASS_NAME,"staticInitializer","setContentTypeBySetHeader="+Boolean.toString(setContentTypeBySetHeader));
+        }
     }
     
     /**
@@ -381,8 +381,8 @@ public class EncodingUtils {
      */
     public static String getJvmConverter(String encoding) {
         //String converter = (String) _converterMap.get(encoding.toLowerCase());
-    	String converter = null;
-    	com.ibm.wsspi.http.EncodingUtils encodingUtils = com.ibm.ws.webcontainer.osgi.WebContainer.getEncodingUtils();
+        String converter = null;
+        com.ibm.wsspi.http.EncodingUtils encodingUtils = com.ibm.ws.webcontainer.osgi.WebContainer.getEncodingUtils();
         if (encodingUtils!=null) {
             converter = encodingUtils.getJvmConverter(encoding);
         }
@@ -412,7 +412,7 @@ public class EncodingUtils {
         if (charset == null) {
             try {
                 charset = Charset.forName(name);
-            } catch (UnsupportedCharsetException e) {
+            } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
                 charset = NOT_FOUND;
             }
             supportedEncodingsCache.put(name, charset);
@@ -426,26 +426,26 @@ public class EncodingUtils {
     }
     
     public static void setContentTypeByCustomProperty (String type, String matchString, HttpServletResponse resp){
-		if (type == null)
-		{		
-			if (matchString.endsWith(".html") || matchString.endsWith(".htm"))
-			{
-				// no type specification...set text/html if
-				type = "text/html";
-			}
-			else
-			{
-				type = "text/plain";
-			}
-		}
-		
-		if (setContentTypeBySetHeader){
-			resp.setHeader(WebContainerConstants.HEADER_CONTENT_TYPE,type);
-		}
-		else{
-			resp.setContentType(type);
-		}
-		if (com.ibm.ejs.ras.TraceComponent.isAnyTracingEnabled()&&logger.isLoggable (Level.FINE))
-			logger.logp(Level.FINE, CLASS_NAME,"setContentTypeByCustomProperty","setContentType --> " +type);
+                if (type == null)
+                {               
+                        if (matchString.endsWith(".html") || matchString.endsWith(".htm"))
+                        {
+                                // no type specification...set text/html if
+                                type = "text/html";
+                        }
+                        else
+                        {
+                                type = "text/plain";
+                        }
+                }
+                
+                if (setContentTypeBySetHeader){
+                        resp.setHeader(WebContainerConstants.HEADER_CONTENT_TYPE,type);
+                }
+                else{
+                        resp.setContentType(type);
+                }
+                if (com.ibm.ejs.ras.TraceComponent.isAnyTracingEnabled()&&logger.isLoggable (Level.FINE))
+                        logger.logp(Level.FINE, CLASS_NAME,"setContentTypeByCustomProperty","setContentType --> " +type);
     }
 }
