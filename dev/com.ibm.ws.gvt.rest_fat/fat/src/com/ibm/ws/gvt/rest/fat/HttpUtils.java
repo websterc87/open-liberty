@@ -13,7 +13,6 @@
 package com.ibm.ws.gvt.rest.fat;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -22,7 +21,6 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
@@ -54,9 +52,9 @@ import componenttest.topology.impl.LibertyServer;
 public class HttpUtils {
     public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
 
-    public static CloseableHttpResponse performPostGvt(LibertyServer server, String endpoint,
-                                                       int expectedResponseStatus, String expectedResponseContentType, String user,
-                                                       String password, String contentType, String content) throws Exception {
+    public static String performPostGvt(LibertyServer server, String endpoint,
+                                        int expectedResponseStatus, String expectedResponseContentType, String user,
+                                        String password, String contentType, String content) throws Exception {
         final String methodName = "performPostGvt()";
 
         try (CloseableHttpClient httpclient = HttpUtils.getInsecureHttpsClient(user, password)) {
@@ -78,18 +76,15 @@ public class HttpUtils {
                 HttpUtils.logHttpResponse(methodName, httpPost, response);
 
                 /*
-                 * Check content type header.
+                 * Check statuscode.
                  */
-                if (expectedResponseContentType != null) {
-                    Header[] headers = response.getHeaders("content-type");
-                    assertNotNull("Expected content type header.", headers);
-                    assertEquals("Expected 1 content type header.", 1, headers.length);
-                    assertEquals("Unexpected content type.", expectedResponseContentType, headers[0].getValue());
-                }
+                StatusLine statusLine = response.getStatusLine();
+                assertEquals("Unexpected status code response.", expectedResponseStatus, statusLine.getStatusCode());
+
                 String contentString = EntityUtils.toString(response.getEntity());
                 Log.info(HttpUtils.class, methodName, "HTTP post response contents: \n" + contentString);
 
-                return response;
+                return contentString;
 
             }
         }

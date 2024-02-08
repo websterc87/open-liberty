@@ -14,8 +14,6 @@ package com.ibm.ws.gvt.rest.fat;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,11 +32,15 @@ public class GvtTest extends BaseTestCase {
     private static final String ENDPOINT_NOTIFICATION = "/IBMJMXConnectorREST/notifications";
     private static final String ENDPOINT_MBEAN = "/IBMJMXConnectorREST/mbeans";
     private static final String DELIVERY_INTERVAL = "{\"deliveryInterval\": \"\\u0036\\u0030\\u0030\\u0030\\u0030\"}";
+
     private static final String CLASS_NAME = "{\"className\": \"\\u0063\\u006f\\u006d\\u002e\\u0069\\u0062\\u006d\\u002e\\u0076\\u0069\\u0072\\u0074\\u0075\\u0061\\u006c\\u0069\\u007a\\u0061\\u0074\\u0069\\u006f\\u006e\\u002e\\u006d\\u0061\\u006e\\u0061\\u0067\\u0065\\u006d\\u0065\\u006e\\u0074\\u002e\\u0069\\u006e\\u0074\\u0065\\u0072\\u006e\\u0061\\u006c\\u002e\\u0047\\u0075\\u0065\\u0073\\u0074\\u004f\\u0053\"}";
+    private static final String NOTIFICATION_RESPONSE = "{\"registrations\":\"/IBMJMXConnectorREST/notifications/-2147483648/registrations\",\"serverRegistrations\":\"/IBMJMXConnectorREST/notifications/-2147483648/serverRegistrations\",\"inbox\":\"/IBMJMXConnectorREST/notifications/-2147483648/inbox\",\"client\":\"/IBMJMXConnectorREST/notifications/-2147483648\"}";
+
+    private static final String MBEANS_RESPONSE = "[{\"objectName\":\"com.ibm.virtualization.management:type=GuestOS\",\"className\":\"com.ibm.virtualization.management.internal.GuestOS\",\"URL\":\"/IBMJMXConnectorREST/mbeans/com.ibm.virtualization.management%3Atype%3DGuestOS\"}]";
 
     @Server("com.ibm.gvt.server")
     public static LibertyServer server;
-    private CloseableHttpResponse unicode;
+    private String contentString;
 
     @Before
     public void before() throws Exception {
@@ -60,11 +62,14 @@ public class GvtTest extends BaseTestCase {
     @Test
     public void testUnicodeForNotification() throws Exception {
 
-        unicode = HttpUtils.performPostGvt(server, ENDPOINT_NOTIFICATION, 200, "application/json", USER1_NAME, USER1_PASSWORD,
-                                           "application/json",
-                                           DELIVERY_INTERVAL);
+        contentString = HttpUtils.performPostGvt(server, ENDPOINT_NOTIFICATION, 200, "application/json", USER1_NAME, USER1_PASSWORD,
+                                                 "application/json",
+                                                 DELIVERY_INTERVAL);
+        /*
+         * Check response contents.
+         */
 
-        assertEquals("Unexpected status code response", HttpStatus.SC_OK, unicode.getStatusLine().getStatusCode());
+        assertEquals("Unexpected HTTP post response contents", NOTIFICATION_RESPONSE, contentString);
 
     }
 
@@ -76,10 +81,13 @@ public class GvtTest extends BaseTestCase {
     @Test
     public void testUnicodeForMbeans() throws Exception {
 
-        unicode = HttpUtils.performPostGvt(server, ENDPOINT_MBEAN, 200, "application/json", USER1_NAME, USER1_PASSWORD,
-                                           "application/json",
-                                           CLASS_NAME);
-        assertEquals("Unexpected status code response", HttpStatus.SC_OK, unicode.getStatusLine().getStatusCode());
+        contentString = HttpUtils.performPostGvt(server, ENDPOINT_MBEAN, 200, "application/json", USER1_NAME, USER1_PASSWORD,
+                                                 "application/json",
+                                                 CLASS_NAME);
+        /*
+         * Check response contents.
+         */
+        assertEquals("Unexpected HTTP post response contents", MBEANS_RESPONSE, contentString);
 
     }
 }
