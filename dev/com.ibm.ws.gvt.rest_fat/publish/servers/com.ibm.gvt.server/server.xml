@@ -13,18 +13,19 @@
 <server>
 
 	<featureManager>
-		<feature>appSecurity-3.0</feature>
+		
 		<feature>jsp-2.3</feature>
-		 <feature>restConnector-2.0</feature> 
+		<feature>restConnector-2.0</feature> 
 		<feature>timedexit-1.0</feature>
-		
-		
+		<feature>componentTest-1.0</feature>
+			
 	</featureManager>
+	
 	<include
 		location="${shared.resource.dir}/configs/httpEndpoint1.xml" />
 	<include
 		location="${shared.resource.dir}/configs/basicRegistry.xml" />	
 	<include
 		location="${shared.resource.dir}/configs/ssl.xml" />
-
+		
 </server>
