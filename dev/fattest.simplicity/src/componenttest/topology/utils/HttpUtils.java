@@ -12,7 +12,7 @@
  *******************************************************************************/
 package componenttest.topology.utils;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -729,24 +729,22 @@ public class HttpUtils {
     }
 
     /**
-     * Method which accepts a post request body and get an(very) insecure HTTPs client and sends a POST request to server and process the response. If the Statuscode is not the
-     * expected an assertion error is thrown.
+     * Make a POST call to an HTTPS REST endpoint.
      *
-     * @param  server                      The character set name. If null, use the default character set.
-     * @param  endpoint                    The JMXConnectorREST endpoint
-     * @param  expectedResponseStatus      Expected response code
-     * @param  expectedResponseContentType Expected response contenttype
+     * @param  server                      The liberty server to send the call to.
+     * @param  endpoint                    The endpoint on the server to call.
+     * @param  expectedResponseStatus      The expected response HTTP return code.
+     * @param  expectedResponseContentType The expected response content type.
      * @param  user                        The user to make the call with.
      * @param  password                    The password to make the call with.
-     * @param  contenttype                 Content-Type
-     * @param  content                     Post request content
-     * @throws Exception
+     * @return                             the response in the form of a string.
+     * @throws Exception                   If the call failed.
      */
 
-    public static String performPost(LibertyServer server, String endpoint,
+    public static String postRequest(LibertyServer server, String endpoint,
                                      int expectedResponseStatus, String expectedResponseContentType, String user,
                                      String password, String contentType, String content) throws Exception {
-        final String methodName = "performPost()";
+        final String methodName = "postRequest()";
 
         try (CloseableHttpClient httpclient = HttpUtils.getInsecureHttpsClient(user, password)) {
             /*
