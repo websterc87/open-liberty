@@ -62,7 +62,7 @@ public class GvtTest extends BaseTestCase {
     @Test
     public void testUnicodeForNotification() throws Exception {
 
-        contentString = HttpUtils.performPostGvt(server, ENDPOINT_NOTIFICATION, 200, "application/json", USER1_NAME, USER1_PASSWORD,
+        contentString = GvtUtils.performPostGvt(server, ENDPOINT_NOTIFICATION, 200, "application/json", USER1_NAME, USER1_PASSWORD,
                                                  "application/json",
                                                  DELIVERY_INTERVAL);
         /*
@@ -81,7 +81,7 @@ public class GvtTest extends BaseTestCase {
     @Test
     public void testUnicodeForMbeans() throws Exception {
 
-        contentString = HttpUtils.performPostGvt(server, ENDPOINT_MBEAN, 200, "application/json", USER1_NAME, USER1_PASSWORD,
+        contentString = GvtUtils.performPostGvt(server, ENDPOINT_MBEAN, 200, "application/json", USER1_NAME, USER1_PASSWORD,
                                                  "application/json",
                                                  CLASS_NAME);
         /*
