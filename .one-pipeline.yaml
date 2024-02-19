@@ -1,0 +1,113 @@
+## Initial copy taken from: https://github.ibm.com/one-pipeline/hello-compliance-app/blob/master/.pipeline-config.yaml
+
+version: '1'
+setup:
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
+  script: |
+    #!/usr/bin/env bash
+    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+      trap env EXIT
+      env
+      set -x
+    fi
+    if [[ "$(get_env pipeline_namespace)" == *"pr"* ||  "$(get_env pipeline_namespace)" == *"ci"* ]]; then
+      # Java Setup Code
+      curl -L https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.2%2B13_openj9-0.43.0/ibm-semeru-open-jdk_x64_linux_21.0.2_13_openj9-0.43.0.tar.gz --output ibm-semeru-open-jdk_x64_linux_21.0.2_13_openj9-0.43.0.tar.gz
+      tar -xvzf ibm-semeru-open-jdk_x64_linux_21.0.2_13_openj9-0.43.0.tar.gz
+      export JAVA_HOME=$(pwd)/jdk-21.0.2+13
+      export PATH=$JAVA_HOME/bin;$PATH
+      java -version
+    fi
+test:
+  abort_on_failure: false
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
+  script: |
+    #!/usr/bin/env bash
+    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+      trap env EXIT
+      env
+      set -x
+    fi
+    # ensure we're located in the source app repo
+    #cd "$WORKSPACE/$(load_repo app-repo path)"
+    #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/scripts/run_test.sh
+    #save_deployment_artifact deployment_iks.yml IKS
+    #save_deployment_artifact deployment_os.yml OPENSHIFT
+    #run_test test com.ibm.unit_tests unit-test-result.xml 1
+    echo "test Code goes here"    
+containerize:
+  dind: true
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
+  script: |
+    #!/usr/bin/env bash
+    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+      trap env EXIT
+      env
+      set -x
+    fi
+    # ensure we build the app repo Dockerfile
+    #cd "$WORKSPACE/$(load_repo app-repo path)"
+    #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/build_setup.sh
+    #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/build.sh
+    echo "containerize Code goes here"      
+deploy:
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
+  script: |
+    #!/usr/bin/env bash
+    # if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+    #   trap env EXIT
+    #   env
+    #   set -x
+    # fi
+    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
+    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
+    echo "deploy Code goes here"    
+acceptance-test:
+  abort_on_failure: false
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
+  script: |
+    #!/usr/bin/env bash
+    # export APP_URL=$(get_env app-url)
+    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/run_test.sh    
+    # run_test acceptance-test com.ibm.acceptance_tests acceptance-test-result.xml 0
+    echo "acceptance-test Code goes here"
+release:
+  abort_on_failure: false
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
+  script: |
+    #!/usr/bin/env bash
+    # if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+    #   trap env EXIT
+    #   env
+    #   set -x
+    # fi
+    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/release.sh
+    echo "Release Code goes here"
+dynamic-scan:
+  dind: true
+  abort_on_failure: false
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
+  script: |
+    #!/usr/bin/env bash
+    # if [ -z "$(get_env opt-in-dynamic-scan "")" ]; then
+    #   echo "If you want to enable this stage, add 'opt-in-dynamic-scan' parameter to your pipeline with any value. Also, please add 'opt-in-dynamic-api-scan' to your pipeline with any value to have api scans running, and 'opt-in-dynamic-ui-scan' with any value to have ui scans running" >&2
+    # else
+    #   if [[ "$(get_env pipeline_namespace)" == *"cc"* ]]; then
+    #     app_url=$(get_env app-url "")
+    #     if [[ -z "${app_url}" ]]; then
+    #       echo "Please provide the app-url as the running application url. Recommended to use stage/test environment to run the Dynamic scan." >&2
+    #       exit 1
+    #     fi
+    #     source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/zap/zap-cc-config
+    #   fi
+    #   source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/zap/trigger-async-zap
+    # fi
+    echo "dynamic-scan Code goes here"
+owasp-zap:
+  dind: true
+  abort_on_failure: true
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
+  script: |
+    #!/usr/bin/env bash
+    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/zap/trigger_zap_scans
+    echo "owasp-zap Code goes here"
