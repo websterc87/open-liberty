@@ -98,7 +98,8 @@ deploy:
     EXPORT target_USER=contbldscp
     EXPORT target_KEY=contbldscp_id_rsa
 
-    ## TODO ADD CODE TO USE GRAB SSH KEY FROM KEYPROTECT AND PUT IT INTO contbldscp_id_rsa
+    # Setup contbldscp_id_rsa
+    echo $(get_env LibertyFS_SSH) > $target_key
 
     touch ${sourceListFile}
     cd "$WORKSPACE/$(load_repo app-repo path)/dev"
