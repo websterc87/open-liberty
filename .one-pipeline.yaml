@@ -91,7 +91,29 @@ deploy:
     # fi
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
-    echo "deploy Code goes here"    
+    EXPORT sourceHost=localhost
+    EXPORT targetHost=libertyfs.hursley.ibm.com
+    EXPORT targetPrefix=/liberty/personal/im/one-pipeline/${PIPELINE_RUN_ID}/
+    EXPORT sourceListFile=fileList.txt
+    EXPORT target_USER=contbldscp
+    EXPORT target_KEY=contbldscp_id_rsa
+
+    ## TODO ADD CODE TO USE GRAB SSH KEY FROM KEYPROTECT AND PUT IT INTO contbldscp_id_rsa
+
+    touch ${sourceListFile}
+    cd "$WORKSPACE/$(load_repo app-repo path)/dev"
+
+    # Zip every file in cnf release as this is needed by subsequent pipelines
+    zip -r openlibertyrelease cnf/release/*
+    echo "openlibertyrelease.zip,${targetPrefix}/openlibertyrelease.zip" >> ${sourceListFile}
+
+    # Seperately upload the open liberty image
+    openLibertyImage=$(find "cnf/release/*/openliberty-*.zip")
+    echo "${openLibertyImage},${targetPrefix}/openlibertyimage.zip" >> ${sourceListFile}
+
+    chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
+    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
+
 acceptance-test:
   abort_on_failure: false
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
