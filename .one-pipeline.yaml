@@ -91,12 +91,12 @@ deploy:
     # fi
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
-    EXPORT sourceHost=localhost
-    EXPORT targetHost=libertyfs.hursley.ibm.com
-    EXPORT targetPrefix=/liberty/personal/im/one-pipeline/${PIPELINE_RUN_ID}/
-    EXPORT sourceListFile=fileList.txt
-    EXPORT target_USER=contbldscp
-    EXPORT target_KEY=contbldscp_id_rsa
+    export sourceHost=localhost
+    export targetHost=libertyfs.hursley.ibm.com
+    export targetPrefix=/liberty/personal/im/one-pipeline/${PIPELINE_RUN_ID}/
+    export sourceListFile=fileList.txt
+    export target_USER=contbldscp
+    export target_KEY=contbldscp_id_rsa
 
     # Setup contbldscp_id_rsa
     echo $(get_env LibertyFS_SSH) > $target_key
