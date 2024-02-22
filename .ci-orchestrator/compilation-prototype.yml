@@ -1,0 +1,12 @@
+type: pipeline_definition
+name: Open Liberty OnePipeline Compilation Prototype
+description: Runs Compilation in OnePipeline/SPS via webhook
+triggers:
+- type: manual
+  groups: ["CSD"]
+    
+steps:
+- stepName: OL Compilation
+  workType: One Pipeline
+  projectName: "open-liberty-onepipeline-compilation-webhook"
+  timeoutInMinutes: 1440
