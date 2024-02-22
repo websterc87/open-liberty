@@ -3,6 +3,7 @@ name: Open Liberty OnePipeline Compilation Prototype
 description: Runs Compilation in OnePipeline/SPS via webhook
 triggers:
 - type: manual
+  name: manual
   groups: ["CSD"]
     
 steps:
