@@ -44,7 +44,16 @@ test:
     #save_deployment_artifact deployment_iks.yml IKS
     #save_deployment_artifact deployment_os.yml OPENSHIFT
     #run_test test com.ibm.unit_tests unit-test-result.xml 1
-    echo "test Code goes here"    
+    echo "test Code goes here"
+compliance-checks:
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
+  dind: true
+  abort_on_failure: false
+  script: |
+    #!/bin/sh
+    
+    #"/opt/commons/compliance-checks/run.sh"        
+    echo "compliance-checks Code goes here"
 containerize: #build-containerize
   dind: true
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
@@ -59,11 +68,6 @@ containerize: #build-containerize
     #cd "$WORKSPACE/$(load_repo app-repo path)"
     #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/build_setup.sh
     #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/build.sh
-
-    # See if Java is already setup
-    java -version
-    echo $JAVA_HOME
-    echo $PATH
 
     # Setup Java and report version
     export JAVA_HOME=$(pwd)/jdk-21.0.2+13
@@ -84,11 +88,11 @@ deploy:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
   script: |
     #!/usr/bin/env bash
-    # if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-    #   trap env EXIT
-    #   env
-    #   set -x
-    # fi
+    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+      trap env EXIT
+      env
+      set -x
+    fi
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
     export sourceHost=localhost
@@ -98,11 +102,13 @@ deploy:
     export target_USER=contbldscp
     export target_KEY=contbldscp_id_rsa
 
-    # Setup contbldscp_id_rsa
-    echo $(get_env LibertyFS_SSH) > $target_key
-
-    touch ${sourceListFile}
+    
+    
     cd "$WORKSPACE/$(load_repo app-repo path)/dev"
+
+    # Setup contbldscp_id_rsa
+    echo $(get_env LibertyFS_SSH) > contbldscp_id_rsa
+    touch ${sourceListFile}
 
     # Zip every file in cnf release as this is needed by subsequent pipelines
     zip -r openlibertyrelease cnf/release/*
