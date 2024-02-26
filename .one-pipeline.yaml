@@ -82,8 +82,6 @@ containerize: #build-containerize
     ./gradlew cnf:initialize
     ./gradlew assemble
     ./gradlew releaseNeeded
-
-    #TODO Add Code to publish zip
 deploy:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
   script: |
@@ -115,9 +113,10 @@ deploy:
     echo "openlibertyrelease.zip,${targetPrefix}/openlibertyrelease.zip" >> ${sourceListFile}
 
     # Seperately upload the open liberty image
-    openLibertyImage=$(find "cnf/release/*/openliberty-*.zip")
+    openLibertyImage=$(echo "cnf/release/dev/openliberty/*/openliberty-*.zip")
     echo "${openLibertyImage},${targetPrefix}/openlibertyimage.zip" >> ${sourceListFile}
 
+    mkdir ~/.ssh
     chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
     $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
 
