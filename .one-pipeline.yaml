@@ -44,7 +44,19 @@ test:
     #save_deployment_artifact deployment_iks.yml IKS
     #save_deployment_artifact deployment_os.yml OPENSHIFT
     #run_test test com.ibm.unit_tests unit-test-result.xml 1
-    echo "test Code goes here"
+    # Setup Java and report version
+    export JAVA_HOME=$(pwd)/jdk-21.0.2+13
+    export PATH=$JAVA_HOME/bin:$PATH
+    java -version
+
+    # Go into OpenLiberty Repo
+    cd "$WORKSPACE/$(load_repo app-repo path)"
+
+    # Follow Compilation and unit test steps from OL Readme.md
+    cd dev
+    ./gradlew cnf:initialize
+    ./gradlew assemble
+
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
   dind: true
@@ -77,11 +89,10 @@ containerize: #build-containerize
     # Go into OpenLiberty Repo
     cd "$WORKSPACE/$(load_repo app-repo path)"
 
-    # Follow Compilation steps from OL Readme.md
+    # Follow packaging steps from OL Readme.md
     cd dev
-    ./gradlew cnf:initialize
-    ./gradlew assemble
     ./gradlew releaseNeeded
+    
 deploy:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
   script: |
