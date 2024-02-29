@@ -56,6 +56,7 @@ test:
     cd dev
     ./gradlew cnf:initialize
     ./gradlew assemble
+    ./gradlew test
 
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
@@ -143,7 +144,19 @@ acceptance-test:
     # export APP_URL=$(get_env app-url)
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/run_test.sh    
     # run_test acceptance-test com.ibm.acceptance_tests acceptance-test-result.xml 0
-    echo "acceptance-test Code goes here"
+    # Setup Java and report version
+    export JAVA_HOME=$(pwd)/jdk-21.0.2+13
+    export PATH=$JAVA_HOME/bin:$PATH
+    java -version
+
+    # Go into OpenLiberty Repo
+    cd "$WORKSPACE/$(load_repo app-repo path)"
+
+    # Run example fat for now
+    # TODO: THis should instead wait for the external ci-orchestrator pipeline to complete the fats
+    cd dev
+    ./gradlew build.example_fat:buildandrun
+    
 release:
   abort_on_failure: false
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
