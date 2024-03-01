@@ -117,7 +117,7 @@ deploy:
     cd "$WORKSPACE/$(load_repo app-repo path)/dev"
 
     # Setup contbldscp_id_rsa
-    echo $(get_env LibertyFS_SSH) > contbldscp_id_rsa
+    get_env LibertyFS_SSH > contbldscp_id_rsa
     chmod 600 contbldscp_id_rsa
     #### TODO REMOVE THIS
     head -2 contbldscp_id_rsa
