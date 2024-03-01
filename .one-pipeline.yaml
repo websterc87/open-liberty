@@ -132,6 +132,10 @@ deploy:
     openLibertyImage=$(echo "cnf/release/dev/openliberty/*/openliberty-*.zip")
     echo "${openLibertyImage},${targetPrefix}/openlibertyimage.zip" >> ${sourceListFile}
 
+    # Also zip up the junit results
+    zip -r published_outputs.zip published_outputs/*
+    echo "published_outputs.zip,${targetPrefix}/published_outputs.zip" >> ${sourceListFile}
+    
     mkdir ~/.ssh
     chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
     $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
