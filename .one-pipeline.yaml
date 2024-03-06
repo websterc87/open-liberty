@@ -52,11 +52,17 @@ test:
     # Go into OpenLiberty Repo
     cd "$WORKSPACE/$(load_repo app-repo path)"
 
+    # Run all the gradle tasks as a separate user to work around
+    # https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
+    # Even without this defects, running as non-root is good practice
+    useradd liberty
+    chown -R liberty .
+
     # Follow Compilation and unit test steps from OL Readme.md
     cd dev
-    ./gradlew cnf:initialize
-    ./gradlew assemble
-    ./gradlew test
+    su liberty -c ./gradlew cnf:initialize
+    su liberty -c ./gradlew assemble
+    su liberty -c ./gradlew test
 
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
@@ -92,7 +98,7 @@ containerize: #build-containerize
 
     # Follow packaging steps from OL Readme.md
     cd dev
-    ./gradlew releaseNeeded
+    su liberty -c ./gradlew releaseNeeded
     
 deploy:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
@@ -160,7 +166,7 @@ acceptance-test:
     # Run example fat for now
     # TODO: THis should instead wait for the external ci-orchestrator pipeline to complete the fats
     cd dev
-    ./gradlew build.example_fat:buildandrun
+    su liberty -c ./gradlew build.example_fat:buildandrun
     
 release:
   abort_on_failure: false
