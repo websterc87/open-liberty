@@ -18,6 +18,8 @@ setup: #code-setup
       export PATH=$JAVA_HOME/bin:$PATH
       java -version
     fi
+    set
+
 detect-secrets: # Detect-secrets (Normally defaults but no-op for now as liberty found 21633 potential secrets that need auditing)
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
   dind: true
@@ -48,14 +50,18 @@ test:
     export JAVA_HOME=$(pwd)/jdk-21.0.2+13
     export PATH=$JAVA_HOME/bin:$PATH
     java -version
-
+    set
+    
     # Go into OpenLiberty Repo
     cd "$WORKSPACE/$(load_repo app-repo path)"
 
     # Run all the gradle tasks as a separate user to work around
     # https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
+    # Force the home directory to be in the workspace, which is outside the docker container
+    # so that anything created their (eg gradle cache) persists between steps
+    # Force the id, so we can be consistent too
     # Even without this defects, running as non-root is good practice
-    useradd liberty
+    useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
     chown -R liberty .
 
     # Follow Compilation and unit test steps from OL Readme.md
@@ -96,6 +102,9 @@ containerize: #build-containerize
     # Go into OpenLiberty Repo
     cd "$WORKSPACE/$(load_repo app-repo path)"
 
+    # Recreate our liberty user
+    useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
+
     # Follow packaging steps from OL Readme.md
     cd dev
     su liberty -c ./gradlew releaseNeeded
@@ -109,6 +118,7 @@ deploy:
       env
       set -x
     fi
+    set
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
     export sourceHost=localhost
@@ -162,6 +172,9 @@ acceptance-test:
 
     # Go into OpenLiberty Repo
     cd "$WORKSPACE/$(load_repo app-repo path)"
+
+    # Recreate our liberty user
+    useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
 
     # Run example fat for now
     # TODO: THis should instead wait for the external ci-orchestrator pipeline to complete the fats
