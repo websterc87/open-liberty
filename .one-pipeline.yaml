@@ -135,11 +135,28 @@ deploy:
     mkdir published_outputs/files
     zip -r published_outputs/files/openlibertyrelease cnf/release/*
 
+    # Create CIArtifactUploaded event
+    mkdir -p published_outputs/events/rawCIArtifacts
+    cat >published_outputs/events/rawCIArtifacts/openlibertyrelease.properties <<EOF
+event=CIArtifactUploaded
+description=Maven Repo Output from OL Compilation
+category=Artifacts
+error=false
+path=openlibertyrelease.zip
+EOF
+
     # Seperately upload the open liberty image
     openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
     echo "Found openLibertyImage ${openLibertyImage}"
     ln -s "${openLibertyImage}" published_outputs/files/openlibertyimage.zip
 
+    mkdir -p published_outputs/events/rawCIArtifacts
+    cat >published_outputs/events/rawCIArtifacts/openlibertyrelease.properties <<EOF
+event=ProductImageUploaded
+imageType=openlibertyimage.zip
+description=Open Liberty Zipped Image
+path=openlibertyimage.zip
+EOF
     # Publish the artifacts back to cognitive
     $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
 
