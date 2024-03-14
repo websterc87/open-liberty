@@ -45,7 +45,7 @@ if [ -d published_outputs/files ] ; then
     rm ${sourceListFile}
     # Move the sent files 
     for file in $(find * -type f) ; do
-        [ -d ../sent_flies/$(dirname $file) ] || mkdir ../sent_files/$(dirname $file)
+        [ -d ../sent_flies/$(dirname $file) ] || mkdir -p ../sent_files/$(dirname $file)
         mv $file ../sent_files/$file
     done
     cd -
@@ -57,7 +57,7 @@ if [ -d published_outputs/events ] ; then
     cd published_outputs/events
     for file in $(find * -name \*.properties) ; do
         # the events are in files called <topic>/<event>.properties
-        topic=$(echo $file | cut -d / f 1)
+        topic=$(echo $file | cut -d / -f 1)
         # add the missing properties to each file
         aggregationId="OnePipeline|${PIPELINE_ID}|${PIPELINE_RUN_ID}"
         executionId=${aggregationId}-${TASK_NAME}-${STEP_NAME}
@@ -76,7 +76,7 @@ EOF
         cat $file
         curl -X POST --insecure https://libh-proxy1.fyre.ibm.com/propertyPublish/$topic --data @$file
         # Move the event into sent_events so we don't attempt to send it again later
-        [ -d ../sent_events/$(dirname $file) ] || mkdir ../sent_events/$(dirname $file)
+        [ -d ../sent_events/$(dirname $file) ] || mkdir -p ../sent_events/$(dirname $file)
         mv $file ../sent_events/$file
     done
     cd -
