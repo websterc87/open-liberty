@@ -63,12 +63,16 @@ test:
     # Even without this defects, running as non-root is good practice
     useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
     chown -R liberty .
+    chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/*.sh
 
     # Follow Compilation and unit test steps from OL Readme.md
     cd dev
     su liberty -c ./gradlew cnf:initialize
     su liberty -c ./gradlew assemble
     su liberty -c ./gradlew test
+
+    # Publish the unit test results back to cognitive
+    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
 
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
@@ -109,6 +113,9 @@ containerize: #build-containerize
     cd dev
     su liberty -c ./gradlew releaseNeeded
     
+    # Probably a no-op
+    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+
 deploy:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
   script: |
@@ -121,41 +128,36 @@ deploy:
     set
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
     # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
-    export sourceHost=localhost
-    export targetHost=libertyfs.hursley.ibm.com
-    export targetPrefix=/liberty/personal/im/one-pipeline/${PIPELINE_RUN_ID}/
-    export sourceListFile=fileList.txt
-    export target_USER=contbldscp
-    export target_KEY=contbldscp_id_rsa
-
-    
     
     cd "$WORKSPACE/$(load_repo app-repo path)/dev"
 
-    # Setup contbldscp_id_rsa
-    get_env LibertyFS_SSH > contbldscp_id_rsa
-    chmod 600 contbldscp_id_rsa
-    #### TODO REMOVE THIS
-    head -2 contbldscp_id_rsa
-    tail -2 contbldscp_id_rsa
-    touch ${sourceListFile}
-
     # Zip every file in cnf release as this is needed by subsequent pipelines
-    zip -r openlibertyrelease cnf/release/*
-    echo "openlibertyrelease.zip,${targetPrefix}/openlibertyrelease.zip" >> ${sourceListFile}
+    mkdir published_outputs/files
+    zip -r published_outputs/files/openlibertyrelease cnf/release/*
+
+    # Create CIArtifactUploaded event
+    mkdir -p published_outputs/events/rawCIArtifacts
+    cat >published_outputs/events/rawCIArtifacts/openlibertyrelease.properties <<EOF
+event=CIArtifactUploaded
+description=Maven Repo Output from OL Compilation
+category=Artifacts
+error=false
+path=openlibertyrelease.zip
+EOF
 
     # Seperately upload the open liberty image
     openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
-    echo "${openLibertyImage},${targetPrefix}/openlibertyimage.zip" >> ${sourceListFile}
+    echo "Found openLibertyImage ${openLibertyImage}"
+    ln -s "${openLibertyImage}" published_outputs/files/openlibertyimage.zip
 
-    # Also zip up the junit results
-    for file in $(find published_outputs -type f) ; do
-        echo "${file},${targetPrefix}/${file}" >> ${sourceListFile}
-    done
-    
-    mkdir ~/.ssh
-    chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
-    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/copyFileList.sh
+    cat >published_outputs/events/rawCIArtifacts/openlibertyimage.properties <<EOF
+event=ProductImageUploaded
+imageType=openlibertyimage.zip
+description=Open Liberty Zipped Image
+path=openlibertyimage.zip
+EOF
+    # Publish the artifacts back to cognitive
+    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
 
 acceptance-test:
   abort_on_failure: false
@@ -180,7 +182,10 @@ acceptance-test:
     # TODO: THis should instead wait for the external ci-orchestrator pipeline to complete the fats
     cd dev
     su liberty -c ./gradlew build.example_fat:buildandrun
-    
+
+    # Publish the FAT test results back to cognitive
+    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+
 release:
   abort_on_failure: false
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d

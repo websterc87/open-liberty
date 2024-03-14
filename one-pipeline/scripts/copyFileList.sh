@@ -11,7 +11,6 @@
 # Contributors:
 #     IBM Corporation - initial API and implementation
 #*******************************************************************************
-
 echo "$(date): Starting copyFileList.sh with parameters:"
 echo "Source host: ${source_USER:-$(whoami)}@${sourceHost}"
 echo "Target host: ${target_USER:-$(whoami)}@${targetHost}"
@@ -48,7 +47,16 @@ if [ "$(uname)" = "OS/390" ] ; then
 fi
 if [ $(grep -c '^[cC]:' "$sourceListFile") -gt 0 ] ; then
     echo "Windows format paths found - converting to cygwin format"
-    sed -i -e 's#\\#/#g' -e 's#^[cC]:#/cygdrive/c#' "$sourceListFile"
+    # Always replace \ with / because we split on it later, and \ being an escape causes all manner of problems
+    sed -i -e 's#\\#/#g' "$sourceListFile"
+    # If we're running locally on a windows box, we may be using cygwin sftp or windows built in.  In both cases
+    # C:/Users works
+    # However if we're running on the jenkins node and sftping to the windows machine, then we will be using cygwin
+    # sftp server, and we must use the
+    # /cygdrive/c/Users format
+    if [ "${sourceHost}" != "localhost" ] ; then
+	sed -i -e 's#^[cC]:#/cygdrive/c#' "$sourceListFile"
+    fi
 fi
 cat "$sourceListFile"
 
@@ -170,6 +178,7 @@ EOF
 # Check we have host keys for each host
 if [ "$targetHost" != "localhost" ] ; then
     if [ ! -f ~/.ssh/known_hosts ] ; then
+	[ -d ~/.ssh ] || mkdir -m 700 ~/.ssh
         ssh-keyscan "$targetHost" >>~/.ssh/known_hosts
     elif [ $(grep -c "$targetHost" ~/.ssh/known_hosts) -eq 0 ] ; then
         ssh-keyscan "$targetHost" >>~/.ssh/known_hosts
@@ -177,6 +186,7 @@ if [ "$targetHost" != "localhost" ] ; then
 fi
 if [ "$sourceHost" != "localhost" ] ; then
     if [ ! -f ~/.ssh/known_hosts ] ; then
+	[ -d ~/.ssh ] || mkdir -m 700 ~/.ssh
         ssh-keyscan "$sourceHost" >>~/.ssh/known_hosts
     elif [ $(grep -c "$sourceHost" ~/.ssh/known_hosts) -eq 0 ] ; then
         ssh-keyscan "$sourceHost" >>~/.ssh/known_hosts
