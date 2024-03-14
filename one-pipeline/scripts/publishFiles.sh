@@ -74,7 +74,7 @@ urlPrefix=https://${targetHost}${targetPrefix}
 EOF
         echo "Sending event to https://libh-proxy1.fyre.ibm.com/propertyPublish/$topic :"
         cat $file
-        curl -X POST --insecure https://libh-proxy1.fyre.ibm.com/propertyPublish/$topic --data @$file
+        curl -X POST --insecure "https://libh-proxy1.fyre.ibm.com/propertyPublish/${topic}/${executionId}" --data-binary @$file
         # Move the event into sent_events so we don't attempt to send it again later
         [ -d ../sent_events/$(dirname $file) ] || mkdir -p ../sent_events/$(dirname $file)
         mv $file ../sent_events/$file
