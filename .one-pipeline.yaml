@@ -148,7 +148,7 @@ deploy:
     # Seperately upload the open liberty image
     openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
     echo "Found openLibertyImage ${openLibertyImage}"
-    ln -s "${openLibertyImage}" published_outputs/files/openlibertyimage.zip
+    ln -s "$PWD/${openLibertyImage}" published_outputs/files/openlibertyimage.zip
 
     cat >published_outputs/events/rawCIArtifacts/openlibertyimage.properties <<EOF
     event=ProductImageUploaded
