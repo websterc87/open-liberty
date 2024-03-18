@@ -15,17 +15,16 @@ package jakarta.data.repository;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import jakarta.data.page.Page;
+import jakarta.data.page.PageRequest;
+
 /**
  * Interface methods copied from Jakarta Data.
  */
 public interface BasicRepository<T, K> extends DataRepository<T, K> {
-    long countBy();
 
     @Delete
     void delete(T entity);
-
-    @Delete
-    void deleteAll();
 
     @Delete
     void deleteAll(Iterable<? extends T> entities);
@@ -38,6 +37,9 @@ public interface BasicRepository<T, K> extends DataRepository<T, K> {
 
     @Find
     Stream<T> findAll();
+
+    @Find
+    Page<T> findAll(PageRequest<T> pageRequest);
 
     Stream<T> findByIdIn(Iterable<K> ids);
 

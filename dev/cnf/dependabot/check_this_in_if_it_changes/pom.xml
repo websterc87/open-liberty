@@ -14,6 +14,11 @@
     <dependency>
       <groupId>biz.aQute.bnd</groupId>
       <artifactId>biz.aQute.bnd.annotation</artifactId>
+      <version>6.4.1</version>
+    </dependency>
+    <dependency>
+      <groupId>biz.aQute.bnd</groupId>
+      <artifactId>biz.aQute.bnd.annotation</artifactId>
       <version>7.0.0</version>
     </dependency>
     <dependency>
@@ -25,6 +30,11 @@
       <groupId>biz.aQute.bnd</groupId>
       <artifactId>biz.aQute.bnd.transform</artifactId>
       <version>7.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>biz.aQute.bnd</groupId>
+      <artifactId>biz.aQute.bnd</artifactId>
+      <version>6.4.1</version>
     </dependency>
     <dependency>
       <groupId>biz.aQute.bnd</groupId>
@@ -124,17 +134,17 @@
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-api</artifactId>
-      <version>3.3.1</version>
+      <version>3.3.4</version>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport-zerodep</artifactId>
-      <version>3.3.1</version>
+      <version>3.3.4</version>
     </dependency>
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport</artifactId>
-      <version>3.3.1</version>
+      <version>3.3.4</version>
     </dependency>
     <dependency>
       <groupId>com.google.errorprone</groupId>
@@ -1127,6 +1137,11 @@
       <version>3.0.0</version>
     </dependency>
     <dependency>
+      <groupId>jakarta.authentication</groupId>
+      <artifactId>jakarta.authentication-api</artifactId>
+      <version>3.1.0-M1</version>
+    </dependency>
+    <dependency>
       <groupId>jakarta.authorization</groupId>
       <artifactId>jakarta.authorization-api</artifactId>
       <version>2.0.0</version>
@@ -1135,6 +1150,11 @@
       <groupId>jakarta.authorization</groupId>
       <artifactId>jakarta.authorization-api</artifactId>
       <version>2.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.authorization</groupId>
+      <artifactId>jakarta.authorization-api</artifactId>
+      <version>3.0.0-M1</version>
     </dependency>
     <dependency>
       <groupId>jakarta.batch</groupId>
@@ -1179,12 +1199,12 @@
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.cdi-api</artifactId>
-      <version>4.1.0.Alpha1</version>
+      <version>4.1.0.Beta2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.cdi-el-api</artifactId>
-      <version>4.1.0.Alpha1</version>
+      <version>4.1.0.Beta2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.enterprise</groupId>
@@ -1194,7 +1214,7 @@
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.lang-model</artifactId>
-      <version>4.1.0.Alpha1</version>
+      <version>4.1.0.Beta2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.inject</groupId>
@@ -1294,7 +1314,7 @@
     <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
-      <version>3.2.0-M1</version>
+      <version>3.2.0-M2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.resource</groupId>
@@ -1315,6 +1335,11 @@
       <groupId>jakarta.security.enterprise</groupId>
       <artifactId>jakarta.security.enterprise-api</artifactId>
       <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.security.enterprise</groupId>
+      <artifactId>jakarta.security.enterprise-api</artifactId>
+      <version>4.0.0-M1</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet.jsp.jstl</groupId>
@@ -1339,7 +1364,7 @@
     <dependency>
       <groupId>jakarta.servlet.jsp</groupId>
       <artifactId>jakarta.servlet.jsp-api</artifactId>
-      <version>4.0.0-M1</version>
+      <version>4.0.0-M2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
@@ -1354,7 +1379,7 @@
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <version>6.1.0-M1</version>
+      <version>6.1.0-M2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.transaction</groupId>
@@ -1684,7 +1709,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.21</version>
+      <version>1.24.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -1694,7 +1719,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.8</version>
+      <version>3.14.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -2163,6 +2188,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.myfaces.core</groupId>
+      <artifactId>myfaces-api</artifactId>
+      <version>4.1.0-RC1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.myfaces.core</groupId>
       <artifactId>myfaces-impl</artifactId>
       <version>2.2.12</version>
     </dependency>
@@ -2180,6 +2210,11 @@
       <groupId>org.apache.myfaces.core</groupId>
       <artifactId>myfaces-impl</artifactId>
       <version>4.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.myfaces.core</groupId>
+      <artifactId>myfaces-impl</artifactId>
+      <version>4.1.0-RC1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.neethi</groupId>
@@ -3634,7 +3669,7 @@
     <dependency>
       <groupId>org.jboss.weld.environment</groupId>
       <artifactId>weld-environment-common</artifactId>
-      <version>6.0.0.Alpha1</version>
+      <version>6.0.0.Beta1</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.weld.se</groupId>
@@ -3654,7 +3689,7 @@
     <dependency>
       <groupId>org.jboss.weld.se</groupId>
       <artifactId>weld-se-core</artifactId>
-      <version>6.0.0.Alpha1</version>
+      <version>6.0.0.Beta1</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.weld</groupId>
@@ -3679,7 +3714,7 @@
     <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-osgi-bundle</artifactId>
-      <version>6.0.0.Alpha1</version>
+      <version>6.0.0.Beta1</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
@@ -4069,7 +4104,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.4.2</version>
+      <version>42.7.2</version>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
@@ -4429,52 +4464,57 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>database-commons</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>db2</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>jdbc</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>kafka</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mongodb</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mssqlserver</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>oracle-free</artifactId>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>oracle-xe</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>selenium</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.5</version>
     </dependency>
     <dependency>
       <groupId>org.testng</groupId>

@@ -18,23 +18,29 @@ import com.ibm.ws.fat.util.FatLogHandler;
 
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61AddAndSetHeaderTest;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61CharsetEncodingTest;
+import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61DispatcherErrorMethodAttributeTest;
+import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61DoTraceRemoveSensitiveHeadersTest;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61EmptyURLPatternMappingTest;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61HTTPResponseCodesTest;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61HTTPServletMappingTest;
+import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61ReadWriteByteBufferTest;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61RequestParameterTest;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61ResponseNoOpAfterCommit;
 import io.openliberty.webcontainer.servlet61.fat.tests.Servlet61ResponseSendRedirectTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-                Servlet61AddAndSetHeaderTest.class,
-                Servlet61CharsetEncodingTest.class,
-                Servlet61EmptyURLPatternMappingTest.class,
-                Servlet61HTTPResponseCodesTest.class,
-                Servlet61HTTPServletMappingTest.class,
-                Servlet61RequestParameterTest.class,
-                Servlet61ResponseNoOpAfterCommit.class,
-                Servlet61ResponseSendRedirectTest.class
+    Servlet61AddAndSetHeaderTest.class,
+    Servlet61CharsetEncodingTest.class,
+    Servlet61DispatcherErrorMethodAttributeTest.class,
+    Servlet61DoTraceRemoveSensitiveHeadersTest.class,
+    Servlet61EmptyURLPatternMappingTest.class,
+    Servlet61HTTPResponseCodesTest.class,
+    Servlet61HTTPServletMappingTest.class,
+    Servlet61ReadWriteByteBufferTest.class,
+    Servlet61RequestParameterTest.class,
+    Servlet61ResponseNoOpAfterCommit.class,
+    Servlet61ResponseSendRedirectTest.class
 })
 public class FATSuite {
 

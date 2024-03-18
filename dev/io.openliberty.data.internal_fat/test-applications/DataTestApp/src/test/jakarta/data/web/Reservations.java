@@ -35,11 +35,12 @@ import java.util.stream.Stream;
 import jakarta.data.Limit;
 import jakarta.data.Sort;
 import jakarta.data.page.Page;
-import jakarta.data.page.Pageable;
+import jakarta.data.page.PageRequest;
 import jakarta.data.repository.BasicRepository;
 import jakarta.data.repository.By;
 import jakarta.data.repository.Find;
 import jakarta.data.repository.OrderBy;
+import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
 
 import io.openliberty.data.repository.Select;
@@ -53,6 +54,12 @@ import io.openliberty.data.repository.function.Extract;
  */
 @Repository
 public interface Reservations extends BasicRepository<Reservation, Long> {
+
+    @Query("SELECT COUNT(o) FROM Reservation o") // JPQL
+    int count();
+
+    int countBy();
+
     boolean deleteByHostIn(List<String> hosts);
 
     long deleteByHostNot(String host);
@@ -105,7 +112,7 @@ public interface Reservations extends BasicRepository<Reservation, Long> {
     @Select({ "start", "stop" })
     Stream<ReservedTimeSlot> findByStopOrStopOrStop(OffsetDateTime stop1, OffsetDateTime stop2, OffsetDateTime stop3);
 
-    Page<Reservation> findByHostStartsWith(String hostPrefix, Pageable<?> pagination, Sort<Reservation> sort);
+    Page<Reservation> findByHostStartsWith(String hostPrefix, PageRequest<?> pagination, Sort<Reservation> sort);
 
     LinkedHashSet<Reservation> findByInviteesContainsOrderByMeetingID(String invitee);
 
