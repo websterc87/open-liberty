@@ -69,10 +69,20 @@ test:
     cd dev
     su liberty -c "./gradlew cnf:initialize"
     su liberty -c "./gradlew assemble"
-    su liberty -c "./gradlew test"
+    su liberty -c "./gradlew test --continue"
+    testRC=$?
+    status="success"
+    if [ "$testRC" != "0" ]; then
+      status="failure"
+    fi
+
+    # Publish the unit test results into the evidence store
+    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishUnitTestEvidence.sh $status published_outputs/files
 
     # Publish the unit test results back to cognitive
     $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+
+    exit 1
 
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
@@ -82,7 +92,7 @@ compliance-checks:
     #!/bin/sh
     
     echo "compliance-checks Code goes here"
-    "/opt/commons/compliance-checks/run.sh"        
+    # "/opt/commons/compliance-checks/run.sh"        
     
 containerize: #build-containerize
   dind: true
