@@ -1,5 +1,5 @@
 type: pipeline_definition
-name: Open Liberty OnePipeline Compilation Prototype
+name: Open Liberty SPS Compilation Prototype
 description: Runs Compilation in SPS
 triggers:
 - type: manual
