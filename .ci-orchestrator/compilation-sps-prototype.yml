@@ -1,0 +1,23 @@
+type: pipeline_definition
+name: Open Liberty OnePipeline Compilation Prototype
+description: Runs Compilation in SPS
+triggers:
+- type: manual
+  triggerName: "Manual"
+  groups: ["CSD"]
+  propertyDefinitions:
+  - name: olBranch
+    defaultValue: sps
+    steps:
+    - stepName: OL Compilation
+    
+steps:
+- stepName: OL Compilation
+  workType: One Pipeline
+  projectName: "Manual Trigger - ContbldPublicOpenLiberty"
+  timeoutInMinutes: 1440
+  properties:
+    onepipeline_toolchainName: ci-toolchain-liberty
+    onepipeline_pipelineName: ci-pipeline
+    branch: ${olBranch}
+    pipeline-config-branch: ${olBranch}
