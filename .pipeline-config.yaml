@@ -5,20 +5,9 @@ setup: #code-setup
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-      trap env EXIT
-      env
-      set -x
-    fi
-    if [[ "$(get_env pipeline_namespace)" == *"pr"* ||  "$(get_env pipeline_namespace)" == *"ci"* ]]; then
-      # Java Setup Code
-      curl -L https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.2%2B13_openj9-0.43.0/ibm-semeru-open-jdk_x64_linux_21.0.2_13_openj9-0.43.0.tar.gz --output ibm-semeru-open-jdk_x64_linux_21.0.2_13_openj9-0.43.0.tar.gz
-      tar -xvzf ibm-semeru-open-jdk_x64_linux_21.0.2_13_openj9-0.43.0.tar.gz
-      export JAVA_HOME=$(pwd)/jdk-21.0.2+13
-      export PATH=$JAVA_HOME/bin:$PATH
-      java -version
-    fi
-    set
+    chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/*.sh
+    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/code-setup.sh
+    exit $?
 
 detect-secrets: # Detect-secrets (Normally defaults but no-op for now as liberty found 21633 potential secrets that need auditing)
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
@@ -26,8 +15,6 @@ detect-secrets: # Detect-secrets (Normally defaults but no-op for now as liberty
   abort_on_failure: stopAndFail
   script: |
     #!/bin/sh
-
-
     echo "Detect Secrets has been disabled for OpenLiberty Prototyping due to large number of unaudited potential secrets"
     # "/opt/commons/detect-secrets/run_scan.sh"    
 test:
@@ -35,54 +22,8 @@ test:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-      trap env EXIT
-      env
-      set -x
-    fi
-    # ensure we're located in the source app repo
-    #cd "$WORKSPACE/$(load_repo app-repo path)"
-    #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/scripts/run_test.sh
-    #save_deployment_artifact deployment_iks.yml IKS
-    #save_deployment_artifact deployment_os.yml OPENSHIFT
-    #run_test test com.ibm.unit_tests unit-test-result.xml 1
-    # Setup Java and report version
-    export JAVA_HOME=$(pwd)/jdk-21.0.2+13
-    export PATH=$JAVA_HOME/bin:$PATH
-    java -version
-    set
-    
-    # Go into OpenLiberty Repo
-    cd "$WORKSPACE/$(load_repo app-repo path)"
-
-    # Run all the gradle tasks as a separate user to work around
-    # https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
-    # Force the home directory to be in the workspace, which is outside the docker container
-    # so that anything created their (eg gradle cache) persists between steps
-    # Force the id, so we can be consistent too
-    # Even without this defects, running as non-root is good practice
-    useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
-    chown -R liberty .
-    chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/*.sh
-
-    # Follow Compilation and unit test steps from OL Readme.md
-    cd dev
-    su liberty -c "./gradlew cnf:initialize"
-    su liberty -c "./gradlew assemble"
-    su liberty -c "./gradlew test --continue"
-    testRC=$?
-    status="success"
-    if [ "$testRC" != "0" ]; then
-      status="failure"
-    fi
-
-    # Publish the unit test results into the evidence store
-    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishUnitTestEvidence.sh $status published_outputs/files
-
-    # Publish the unit test results back to cognitive
-    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
-
-    exit 1
+    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/unit-test.sh
+    exit $?
 
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
@@ -90,7 +31,6 @@ compliance-checks:
   abort_on_failure: false
   script: |
     #!/bin/sh
-    
     echo "compliance-checks Code goes here"
     # "/opt/commons/compliance-checks/run.sh"        
     
@@ -99,129 +39,29 @@ containerize: #build-containerize
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-      trap env EXIT
-      env
-      set -x
-    fi
-    # ensure we build the app repo Dockerfile
-    #cd "$WORKSPACE/$(load_repo app-repo path)"
-    #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/build_setup.sh
-    #source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/build.sh
-
-    # Setup Java and report version
-    export JAVA_HOME=$(pwd)/jdk-21.0.2+13
-    export PATH=$JAVA_HOME/bin:$PATH
-    java -version
-
-    # Go into OpenLiberty Repo
-    cd "$WORKSPACE/$(load_repo app-repo path)"
-
-    # Recreate our liberty user
-    useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
-
-    # Follow packaging steps from OL Readme.md
-    cd dev
-    su liberty -c "./gradlew releaseNeeded"
-
-    # # Code To save artifact into known area (WIP)
-    # # Make sure you connect the built artifact to the repo and commit
-    # # it was built from. The source repo asset format is:
-    # #   <repo_URL>.git#<commit_SHA>
-    # url="$(load_repo app-repo url)"
-    # sha="$(load_repo app-repo commit)"
-
-    # openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
-    # save_artifact openlibertyimage \
-    # type=zip \
-    # "name=openlibertyimage.zip" \
-    # "location=${openLibertyImage}" \
-    # "source=${url}.git#${sha}"
-
-    # Probably a no-op
-    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/package.sh
+    exit $?
 
 deploy:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
   script: |
     #!/usr/bin/env bash
-    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-      trap env EXIT
-      env
-      set -x
-    fi
-    set
-    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy_setup.sh
-    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
-    
-    cd "$WORKSPACE/$(load_repo app-repo path)/dev"
-
-    # Zip every file in cnf release as this is needed by subsequent pipelines
-    mkdir published_outputs/files
-    zip -r published_outputs/files/openlibertyrelease cnf/release/*
-
-    # Create CIArtifactUploaded event
-    mkdir -p published_outputs/events/rawCIArtifacts
-    cat >published_outputs/events/rawCIArtifacts/openlibertyrelease.properties <<EOF
-    event=CIArtifactUploaded
-    description=Maven Repo Output from OL Compilation
-    category=Artifacts
-    error=false
-    path=openlibertyrelease.zip
-    EOF
-
-    # Seperately upload the open liberty image
-    openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
-    echo "Found openLibertyImage ${openLibertyImage}"
-    ln -s "$PWD/${openLibertyImage}" published_outputs/files/openlibertyimage.zip
-
-    cat >published_outputs/events/rawCIArtifacts/openlibertyimage.properties <<EOF
-    event=ProductImageUploaded
-    imageType=openlibertyimage.zip
-    description=Open Liberty Zipped Image
-    path=openlibertyimage.zip
-    EOF
-    # Publish the artifacts back to cognitive
-    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/deploy.sh
+    exit $?
 
 acceptance-test:
   abort_on_failure: false
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    # export APP_URL=$(get_env app-url)
-    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/run_test.sh    
-    # run_test acceptance-test com.ibm.acceptance_tests acceptance-test-result.xml 0
-    # Setup Java and report version
-    export JAVA_HOME=$(pwd)/jdk-21.0.2+13
-    export PATH=$JAVA_HOME/bin:$PATH
-    java -version
-
-    # Go into OpenLiberty Repo
-    cd "$WORKSPACE/$(load_repo app-repo path)"
-
-    # Recreate our liberty user
-    useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
-
-    # Run example fat for now
-    # TODO: THis should instead wait for the external ci-orchestrator pipeline to complete the fats
-    cd dev
-    su liberty -c "./gradlew build.example_fat:buildandrun"
-
-    # Publish the FAT test results back to cognitive
-    $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/acceptance-test.sh
+    exit $?
 
 release:
   abort_on_failure: false
   image: icr.io/continuous-delivery/pipeline/pipeline-base-image:2.39@sha256:499559f10a289300828536196947da164c09cece319e3ce3f30fd408cde55c5d
   script: |
     #!/usr/bin/env bash
-    # if [[ "$PIPELINE_DEBUG" == 1 ]]; then
-    #   trap env EXIT
-    #   env
-    #   set -x
-    # fi
-    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/release.sh
     echo "Release Code goes here"
 dynamic-scan:
   dind: true
@@ -229,19 +69,6 @@ dynamic-scan:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    # if [ -z "$(get_env opt-in-dynamic-scan "")" ]; then
-    #   echo "If you want to enable this stage, add 'opt-in-dynamic-scan' parameter to your pipeline with any value. Also, please add 'opt-in-dynamic-api-scan' to your pipeline with any value to have api scans running, and 'opt-in-dynamic-ui-scan' with any value to have ui scans running" >&2
-    # else
-    #   if [[ "$(get_env pipeline_namespace)" == *"cc"* ]]; then
-    #     app_url=$(get_env app-url "")
-    #     if [[ -z "${app_url}" ]]; then
-    #       echo "Please provide the app-url as the running application url. Recommended to use stage/test environment to run the Dynamic scan." >&2
-    #       exit 1
-    #     fi
-    #     source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/zap/zap-cc-config
-    #   fi
-    #   source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/zap/trigger-async-zap
-    # fi
     echo "dynamic-scan Code goes here"
 owasp-zap:
   dind: true
@@ -249,5 +76,4 @@ owasp-zap:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    # source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/zap/trigger_zap_scans
     echo "owasp-zap Code goes here"
