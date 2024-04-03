@@ -28,12 +28,14 @@ java -version
 cd "$WORKSPACE/$(load_repo app-repo path)"
 
 # Recreate our liberty user
-useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
+#useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
 
 # Run example fat for now
 # TODO: THis should instead wait for the external ci-orchestrator pipeline to complete the fats
+#cd dev
+#su liberty -c "./gradlew build.example_fat:buildandrun"
 cd dev
-su liberty -c "./gradlew build.example_fat:buildandrun"
+./gradlew build.example_fat:buildandrun
 
 # Publish the FAT test results back to cognitive
 $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh

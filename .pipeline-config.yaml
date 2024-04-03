@@ -17,6 +17,7 @@ detect-secrets: # Detect-secrets (Normally defaults but no-op for now as liberty
     #!/bin/sh
     echo "Detect Secrets has been disabled for OpenLiberty Prototyping due to large number of unaudited potential secrets"
     # "/opt/commons/detect-secrets/run_scan.sh"    
+
 test:
   abort_on_failure: false
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
@@ -32,7 +33,7 @@ compliance-checks:
   script: |
     #!/bin/sh
     echo "compliance-checks Code goes here"
-    # "/opt/commons/compliance-checks/run.sh"        
+    "/opt/commons/compliance-checks/run.sh"
     
 containerize: #build-containerize
   dind: true

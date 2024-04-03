@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x
 #*******************************************************************************
 # Copyright (c) 2024 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
@@ -30,26 +30,19 @@ java -version
 # Go into OpenLiberty Repo
 cd "$WORKSPACE/$(load_repo app-repo path)"
 
-# Recreate our liberty user
-useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
-
 # Follow packaging steps from OL Readme.md
 cd dev
-su liberty -c "./gradlew releaseNeeded"
+./gradlew releaseNeeded
 
-# # Code To save artifact into known area (WIP)
-# # Make sure you connect the built artifact to the repo and commit
-# # it was built from. The source repo asset format is:
-# #   <repo_URL>.git#<commit_SHA>
-# url="$(load_repo app-repo url)"
-# sha="$(load_repo app-repo commit)"
+# Code To save artifact into known area (WIP)
+# Make sure you connect the built artifact to the repo and commit
+# it was built from. The source repo asset format is:
+#   <repo_URL>.git#<commit_SHA>
+url="$(load_repo app-repo url)"
+sha="$(load_repo app-repo commit)"
 
-# openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
-# save_artifact openlibertyimage \
-# type=zip \
-# "name=openlibertyimage.zip" \
-# "location=${openLibertyImage}" \
-# "source=${url}.git#${sha}"
-
-# Probably a no-op
-$WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+openLibertyImage=$(echo cnf/release/dev/openliberty/*/openliberty-*.zip)
+save_artifact openlibertyimage type=zip \
+  "name=openlibertyimage.zip" \
+  "location=${openLibertyImage}" \
+  "source=${url}.git#${sha}"

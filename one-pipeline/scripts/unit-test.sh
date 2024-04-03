@@ -29,20 +29,19 @@ export PATH=$JAVA_HOME/bin:$PATH
 java -version
 set
 
-# Go into OpenLiberty Repo
-cd "$WORKSPACE/$(load_repo app-repo path)"
+# Create a copy of the compiled code in which to run the unit tests
+cd "$WORKSPACE/"
+cp -a "$(load_repo app-repo path)" "unit_tests"
 
-# Run all the gradle tasks as a separate user to work around
+# Run the unit tests as a separate user to work around
 # https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
-# Force the home directory to be in the workspace, which is outside the docker container
-# so that anything created their (eg gradle cache) persists between steps
+# This also works around issues running the packaging steps in a separate container at the same time
 # Force the id, so we can be consistent too
-# Even without this defects, running as non-root is good practice
-useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
-chown -R liberty .
+useradd --no-user-group --uid 1500 liberty
+chown -R liberty unit_tests
 
-# Follow Compilation and unit test steps from OL Readme.md
-cd dev
+# Follow unit test steps from OL Readme.md
+cd unit_tests/dev
 su liberty -c "./gradlew test --continue"
 testRC=$?
 status="success"

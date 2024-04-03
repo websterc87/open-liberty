@@ -31,7 +31,7 @@ if [ -f ${target_KEY} ] ; then
     echo "${target_KEY} already exists"
 else
     echo "Creating ${target_KEY} from secrets manager"
-    get_env LibertyFS_SSH > ${target_KEY}
+    get_env libertyfs-ssh-key > ${target_KEY}
     chmod 600 ${target_KEY}
 fi
 touch ${sourceListFile}

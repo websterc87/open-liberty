@@ -1,4 +1,4 @@
-#!/bin/bash -u
+#!/bin/bash -ue
 #*******************************************************************************
 # Copyright (c) 2024 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
@@ -19,7 +19,6 @@ attachments=()
 
 for file in $(cd $test_result_folder; find *.xml -type f) ; do
   attachments+=("--attachment $test_result_folder/$file")
-)
 done
 
 collect-evidence \

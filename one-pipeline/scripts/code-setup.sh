@@ -30,16 +30,8 @@ set
 # Go into OpenLiberty Repo
 cd "$WORKSPACE/$(load_repo app-repo path)"
 
-# Run all the gradle tasks as a separate user to work around
-# https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
-# Force the home directory to be in the workspace, which is outside the docker container
-# so that anything created their (eg gradle cache) persists between steps
-# Force the id, so we can be consistent too
-# Even without this defects, running as non-root is good practice
-useradd -d "$WORKSPACE/liberty" --no-user-group --uid 1500 liberty
-chown -R liberty .
-
-# Follow Compilation and unit test steps from OL Readme.md
+# Run the compilation steps from OL README.md
+# This is done as root, because several of the compliance scans fail if not
 cd dev
-su liberty -c "./gradlew cnf:initialize"
-su liberty -c "./gradlew assemble"
+./gradlew cnf:initialize
+./gradlew assemble
