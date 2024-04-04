@@ -31,7 +31,7 @@ set
 
 # Create a copy of the compiled code in which to run the unit tests
 cd "$WORKSPACE/"
-cp -a "$(load_repo app-repo path)" "unit_tests"
+cp -la "$(load_repo app-repo path)" "unit_tests"
 
 # Run the unit tests as a separate user to work around
 # https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
@@ -54,5 +54,9 @@ $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishUnitTestEviden
 
 # Publish the unit test results back to cognitive
 $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+
+# Tidy up to save disk space
+cd "$WORKSPACE/"
+rm -rf unit_tests
 
 exit $testRC
