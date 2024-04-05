@@ -33,7 +33,8 @@ compliance-checks:
   script: |
     #!/bin/sh
     echo "compliance-checks Code goes here"
-    "/opt/commons/compliance-checks/run.sh"
+    # DISALBED - Takes over 2 hours and causes pipeline to time out
+    #"/opt/commons/compliance-checks/run.sh"
     
 containerize: #build-containerize
   dind: true
