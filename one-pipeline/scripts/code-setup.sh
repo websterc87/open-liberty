@@ -34,4 +34,11 @@ cd "$WORKSPACE/$(load_repo app-repo path)"
 # This is done as root, because several of the compliance scans fail if not
 cd dev
 ./gradlew cnf:initialize
+initRC=$?
+if [ "$initRC" != "0" ]; then
+    exit $initRC
+fi
+
 ./gradlew assemble
+assembleRC=$?
+exit $assembleRC

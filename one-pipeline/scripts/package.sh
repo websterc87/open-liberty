@@ -33,6 +33,10 @@ cd "$WORKSPACE/$(load_repo app-repo path)"
 # Follow packaging steps from OL Readme.md
 cd dev
 ./gradlew releaseNeeded
+releaseNeededRC=$?
+if [ "$releaseNeededRC" != "0" ]; then
+    exit $releaseNeededRC
+fi
 
 # Code To save artifact into known area (WIP)
 # Make sure you connect the built artifact to the repo and commit
