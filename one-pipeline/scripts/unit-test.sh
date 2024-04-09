@@ -29,34 +29,34 @@ export PATH=$JAVA_HOME/bin:$PATH
 java -version
 set
 
-# # Create a copy of the compiled code in which to run the unit tests
-# cd "$WORKSPACE/"
-# cp -la "$(load_repo app-repo path)" "unit_tests"
+# Create a copy of the compiled code in which to run the unit tests
+cd "$WORKSPACE/"
+cp -la "$(load_repo app-repo path)" "unit_tests"
 
-# # Run the unit tests as a separate user to work around
-# # https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
-# # This also works around issues running the packaging steps in a separate container at the same time
-# # Force the id, so we can be consistent too
-# useradd --no-user-group --uid 1500 liberty
-# chown -R liberty unit_tests
+# Run the unit tests as a separate user to work around
+# https://wasrtc.hursley.ibm.com:9443/jazz/web/projects/WS-CD#action=com.ibm.team.workitem.viewWorkItem&id=299296
+# This also works around issues running the packaging steps in a separate container at the same time
+# Force the id, so we can be consistent too
+useradd --no-user-group --uid 1500 liberty
+chown -R liberty unit_tests
 
-# # Follow unit test steps from OL Readme.md
-# cd unit_tests/dev
-# su liberty -c "./gradlew test --continue"
-# testRC=$?
-# status="success"
-# if [ "$testRC" != "0" ]; then
-#     status="failure"
-# fi
+# Follow unit test steps from OL Readme.md
+cd unit_tests/dev
+su liberty -c "./gradlew test --continue"
+testRC=$?
+status="success"
+if [ "$testRC" != "0" ]; then
+    status="failure"
+fi
 
-# # Publish the unit test results into the evidence store
-# $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishUnitTestEvidence.sh $status published_outputs/files
+# Publish the unit test results into the evidence store
+$WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishUnitTestEvidence.sh $status published_outputs/files
 
-# # Publish the unit test results back to cognitive
-# $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
+# Publish the unit test results back to cognitive
+$WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/publishFiles.sh
 
-# # Tidy up to save disk space
-# cd "$WORKSPACE/"
-# rm -rf unit_tests
+# Tidy up to save disk space
+cd "$WORKSPACE/"
+rm -rf unit_tests
 
-# exit $testRC
+exit $testRC

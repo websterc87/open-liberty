@@ -7,6 +7,11 @@ setup: #code-setup
     #!/usr/bin/env bash
     chmod +x $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/*.sh
     . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/code-setup.sh
+    setupRC=$?
+    if [ "$setupRC" != "0" ]; then
+      exit $setupRC
+    fi
+    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/unit-test.sh
     exit $?
 
 detect-secrets: # Detect-secrets (Normally defaults but no-op for now as liberty found 21633 potential secrets that need auditing)
@@ -23,8 +28,7 @@ test:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25@sha256:dd2000b525336acd00e9b95b74f15696797764725adbb25fa720e9431d558cbf
   script: |
     #!/usr/bin/env bash
-    . $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/one-pipeline/scripts/unit-test.sh
-    exit $?
+    echo "Unit Test is currently done in code-setup due to gradle concurrency issues"
 
 compliance-checks:
   image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.25
